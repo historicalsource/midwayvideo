@@ -1,0 +1,82 @@
+#
+# Assorted directories
+#
+INCDIR=		/video/include/glide
+BUILDDIR=	..
+
+#
+# Include files everyone is dependant on
+#
+INCS=	$(INCDIR)/glide.h
+
+#
+# C Source Modules
+#
+CSRCS=	fail.c
+
+#
+# Object Modules
+#
+OBJS=	$(CSRCS:.c=.obj)
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/fail.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET) dummy
+
+#
+# Dummy target
+#
+dummy:
+	@echo FAIL DONE
+
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/fail.exe:	$(OBJS)
+	@echo Linking $<
+	@gcc -O3 -I$(INCDIR) -o $(BUILDDIR)/fail.exe $(OBJS)
+	@echo $(BUILDDIR)\fail.exe built
+
+#
+# Rules and dependencies
+#
+%.d:	%.c
+	@echo Generating dependencies for $<
+	@gcc -M -I$(INCDIR) $< | sed 's/$*.o/&bj $@/g' > $@
+
+%.obj:	%.c
+	@echo Compiling $<
+	@gcc -c -O3 -I$(INCDIR) -o $@ $<
+
+include	$(CSRCS:.c=.d)
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning fail
+	@if EXIST fail.obj del fail.obj
+	@if EXIST fail.d del fail.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering $(BUILDDIR)\fail.exe
+	@if EXIST $(BUILDDIR)\fail.exe del $(BUILDDIR)\fail.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding $(BUILDDIR)\fail.exe
+	@$(MAKE) --no-print-directory
+
+	

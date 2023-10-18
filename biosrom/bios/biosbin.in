@@ -1,0 +1,17 @@
+	org	$bfc04000
+
+text	group	obj($80000000)
+data	group	obj()
+bss	group	obj(),bss
+ubss	group	obj(),bss,cache($20000000)
+
+	section.8 .text,text
+	section.8 .rdata,data
+	section.8 .ctors,data
+	section.8 .dtors,data
+	section.8 .data,data
+	section.8 .sdata,data
+	section.8 .sbss,bss
+	section.8 .bss,bss
+	section.8 uncached.bss,ubss
+		      

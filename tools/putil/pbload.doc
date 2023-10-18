@@ -1,0 +1,504 @@
+PBLOAD version 1.0
+------------------
+13 March 97
+
+This is the Psy-Q/MIPS version of the program BANKLOAD. This
+downloads sound banks (.BNK files) to the DCS2 sound system. Before
+you can do this, you must unlock the I/O ASIC using PWAKE and then
+download the sound operating system using POSLOAD.
+
+Read through this doc to understand how banks are loaded. This code
+also supports loading "engine" sample-playback sounds.
+
+
+**********************************************************************
+
+BANKLOAD
+
+Version 1.0 L
+-------------
+27 Nov 96
+
+Fixed bug reported by Carl Ferreira at Atari. Ending load address 
+put into the table was 1 word too big. The actual sample data,
+however, was being laoded correctly (contiguously). The result is
+that the first word of the next sample would get played at the end of
+the current sample.
+
+-c "check" option now prints out start/end info if in engine mode.
+
+
+Version 1.0 K
+-------------
+8 Oct 96
+
+Changed sample rate for engine sounds to half of normal 31250 =
+15625. Now calculated and displayed correctly.
+
+
+Version 1.0 J
+-------------
+4 Oct 96
+
+Cleaned up version with engine sample support. Changed format of
+addresses and fixed bugs in engine sample table. Addresses in the
+table are now stored in page:offset format. Sample format is now
+16-bit, mono, 15625 Hz sample rate.
+
+
+Version 1.0 I
+-------------
+17 Sep 96
+
+Added -e option to download 'engine samples'. The usage is
+
+BANKLOAD -e FILENAME BANK1 BANK2 ...
+
+where FILENAME is a text file (e.g. ENGINE.DAT) that has a list of 4
+files, one per line, including extension, to be loaded. For example:
+
+sample1.snd
+sample2.snd
+sample3.snd
+sound1.snd
+
+At this time, there MUST be four samples specified. The first three
+are used for the 'player' engine sound, and the fourth is for any
+'drone' engine sounds. 
+
+The samples can be any size (within the DCS2 2MB restriction) and are
+assumed to be 16-bit raw .SND files.
+
+After the FILENAME, you can list any normal DCS banks to be loaded.
+
+You cannot load engine samples while playing (i.e. as you would with
+the -p option). The engine samples are assumed to be loaded right
+after the sound call table, and therefore must always be loaded
+'first'.
+
+The first 32 locations after the sound call table, starting at
+byte-wise address 0x4000, word-wise address 0x2000, are four pairs of
+start and end locations for the four samples. The addresses are
+byte-wise, 32-bits each, and take up two 16-bit D/RAM locations each.
+
+
+word-wise location in D/RAM     contents
+---------------------------     --------
+
+0x2000                          upper 16 bits of sample #1 start addr
+0x2001                          lower 16 bits of sample #1 start addr
+0x2002                          upper 16 bits of sample #1 end addr
+0x2003                          lower 16 bits of sample #1 end addr
+
+.
+.
+.
+
+0x200C                          upper 16 bits of sample #4 start addr
+0x200D                          lower 16 bits of sample #4 start addr
+0x200E                          upper 16 bits of sample #4 end addr
+0x200F                          lower 16 bits of sample #4 end addr
+
+Therefore, the first engine sample sound data starts at word-wise
+address 0x2010, which is byte-wise address 0x4020.
+
+
+Version 1.0 H
+-------------
+
+26 July 96
+
+Added -c option to run bankload without actually sending any data
+over to the V+ sound board. This is for checking bank sizes and that
+a list of banks will fit into the available 2 megabytes of V+ sound
+RAM.
+
+
+Version 1.0 G
+-------------
+
+20 Feb 96
+
+New version for V+ op sys. Deals with new faster download while
+playing mode. Only actual functional change needed was to add check
+for read between back to back writes, which was happening during the
+download sound call table code. This is because the data xfer is now
+arbitrated by polling on the host side rather than interrupt driven.
+The download bank data was already structured such that the bit was
+checked for each word sent out.
+
+Note: You probably won't notice any speed-up when loading from the PC
+with BANKLOAD - the PC is lagging behind the sound DSP. The download
+speedup will only be noticed on the actual V+ when the 'C31 is
+feeding it.
+
+
+Versions 1.0 E and F
+--------------------
+
+Intermediate debug versions for new faster V+ download while playing
+op sys.
+
+Version 1.0 D
+-------------
+
+26 June 95
+
+Added support for renumbering marked calls in the BANKLOAD.LST file.
+
+
+
+Version 1.0 C - (first release 21 June 95)
+------------------------------------------
+
+For technical notes, see the C source code file BANKLOAD.C.
+
+
+BANKLOAD.EXE is the development tool to load sound banks (.BNK files)
+into the sound RAM on the V+ system.
+
+
+Background
+----------
+
+* Current development versions of the V+ have 4 megabytes of sound
+  RAM. This is equivalent to 8 of the 4 Mb ROMs that we have been using
+  in pinball. The reason for this was so that development could be done
+  using the current PC plug-in developent card until the V+ sound
+  section was ready.
+
+* Production versions (and probably future development versions) of
+  the V+ will only have 2 megabytes of RAM. This is equivalent to 4 of
+  the 4 Mb ROMs.
+
+* BANKLOAD deals with bank files, which have a .BNK extension. Bank
+  files are made by PLBUILD, using the -B option. See the text file
+  BANK.DOC in the /PLBUILD directory for more information about the
+  differences between making .ROM files and making .BNK files. 
+
+* For each bank file, BANKLOAD also needs the .LST file. When PLBUILD
+  builds a bank, it creates the .BNK file and the .LST file. The .BNK
+  file contains the playlist data and the compressed audio data. The
+  .LST file is a text report file, the same as it is for a ROM build,
+  except that each bank has its own unique .LST file. BANKLOAD needs the
+  .LST files so that it can assemble a master text report file for all
+  of the banks loaded.
+
+
+Usage
+-----
+
+Input Files:
+
+
+BANKLOAD.DAT - Text file created each time that BANKLOAD is run,
+               containing information about the next available sound
+               call table entry and the next available RAM location.
+               This file is read back in when BANKLOAD is run in the
+               "download while playing" mode. 
+
+
+For each bank:
+
+
+BANKNAME.BNK - Binary file containing playlist and audio data.
+
+
+BANKNAME.LST - Text file containing build report and sound call info.
+
+
+Output Files:
+
+
+BANKLOAD.DAT - Created each time that BANKLOAD is run. Running
+               BANKLOAD in normal mode flushes the file and writes
+               out the data for the bank or banks just loaded.
+               Running BANKLOAD in -P mode appends and merges the
+               data for the newly loaded banks with the data for any
+               previously loaded banks.
+
+
+BANKLOAD.LST - Master text report file. This contains the aggregate
+               sound call table for all of the banks loaded,
+               renumbered to reflect the order in which the banks - and
+               the sound calls in them - were loaded. See below for
+               more information about sound call renumbering.
+
+Command line:
+
+
+BANKLOAD BANK_1 BANK_2 BANK_3 ... BANK_N
+
+
+  The command line above will silence the sound board and load BANK_1,
+BANK_2, and BANK_3, all the way through bank N.
+
+* Bank names do not have extensions. EFFECTS.BNK is specified as
+  EFFECTS, without any extension.
+
+* There is a maximum of 16 banks per command line. More banks can be
+  loaded using multiple loads, along with using the -P option.
+
+* The maximum number of banks is limited by the size of the banks and
+  the amount of RAM. The .LST file for the bank, and the
+  BANKLOAD.LST, show you the size of each bank, and how much RAM is available. If you
+  try to load more banks than there is room in RAM, BANKLOAD will give
+  an error and stop.
+
+* Each time you run BANKLOAD in normal mode, the sound board is
+  silenced, the sound call table is flushed, and the specified banks
+  are loaded at the start of the RAM. To load subsequent banks without
+  overwriting existing data, use the -P option.
+
+
+Command line for "load while playing":
+
+
+BANKLOAD -P BANK_6 BANK_7 ... BANK_M
+
+
+  The command line above will allow the sound board to keep playing,
+and will load banks BANK_6 through BANK_M. The banks and the sound
+calls are appended to the existing data already loaded.
+
+* Only one, or possibly two, tracks can be playing during a load. If
+  too many tracks are playing, then the sound DSP will not have enough
+  real time left to handle the download. The sounds will play fine,
+  but BANKLOAD will bog.
+
+* Loading while playing is slower than a normal load. In normal mode,
+  the DSP spends all of its time handling the load, and there is
+  minimal handshaking between BANKLOAD and the DSP. In "load while
+  playing" mode, the sound DSP must do double duty between playing
+  sound and handling the download. Also, BANKLOAD must check an "I am
+  busy" flag before each transfer, which further slows the process.
+
+* BANKLOAD in -P mode needs to read the BANKLOAD.DAT file to find out
+  what has been already loaded, how big it was, and where it went. If
+  it can't find the BANKLOAD.DAT file, then it will give an error and
+  stop.
+
+* You don't necessarily have to be playing sound when running
+  BANKLOAD in -P mode. In fact, if the DSP is not playing anything, a
+  -P load is almost as fast as a normal load. Think of -P mode as both
+  "load while playing" mode and "append new data to existing data" mode.
+
+
+Sound Call Renumbering
+----------------------
+
+  Banks are loaded in the order specified on the command line. The
+sound calls (playlists) in the banks are entered into the sound call
+table in the same order.
+
+  The actual sound call number that triggers a playlist within a bank
+will depend on the order in which the bank was loaded. The
+BANKLOAD.LST text report file will tell what the sound call number
+is.
+
+* Sound call 0 is always reserved as "kill all sound". This stops all
+  tracks playing, and resets the volume and pan for each track.
+
+* In a .PLS file, playlists can be numbered starting at 0. Also, any
+  'skipped' playlist numbers are noted and stored as null sound calls.
+  This is so that you can go back later and add playlists to a bank,
+  filling in the skipped numbers, without having all the playlists
+  being renumbered. For example:
+
+If you have the following playlists defined in your .PLS file:
+
+playlist	0
+playlist	1
+playlist	3
+playlist	7
+
+then the playlist table stored in the .BNK file would be:
+
+playlist	0
+playlist	1
+playlist	NULL (placeholder for 2)
+playlist	3
+playlist	NULL (placeholder for 4) 
+playlist	NULL (placeholder for 5) 
+playlist	NULL (placeholder for 6) 
+playlist	7
+
+
+  Playlists are assigned the next available sound call number as they
+are loaded. For example:
+
+  If the above playlist examples were in the bank EXAMPLE.BNK then
+loading that bank in normal mode would create the following sound
+call table:
+
+
+Sound Call   gets mapped to ->	Playlist
+----------			--------
+
+0				always reserved for 'kill all sound'
+
+1				0
+
+2				1
+ 
+3				NULL (nothing happens if this call is sent)
+
+4				3
+
+5				NULL (nothing happens if this call is sent)
+
+6				NULL (nothing happens if this call is sent)
+
+7				NULL (nothing happens if this call is sent)
+
+8				7
+
+
+Now suppose that you had a bank file with just one playlist:
+
+
+playlist	1
+
+
+and you loaded this playlist using the -P option so it would be added
+to the above data. The playlist table stored in this .BNK file would
+be...
+
+playlist	NULL
+
+playlist	1
+
+...since playlists can start at number zero.
+
+
+When this bank is loaded, then the playlists will be assigned sound
+call numbers starting at the next available number:
+
+
+Sound Call   gets mapped to ->	Playlist
+----------			--------
+
+0				always reserved for 'kill all sound'
+
+sound calls from first bank...
+
+1				0
+
+2				1
+ 
+3				NULL (nothing happens if this call is sent)
+
+4				3
+
+5				NULL (nothing happens if this call is sent)
+
+6				NULL (nothing happens if this call is sent)
+
+7				NULL (nothing happens if this call is sent)
+
+8				7
+
+sound calls from second bank...
+
+9				NULL (playlist 0 in 2nd bank was
+				      null, so the place is held)
+
+10				1 (playlist 1 from 2nd bank)
+
+
+The purpose for this scheme is so that you can add playlists to a
+bank without causing all the playlist numbers within the bank to be
+reordered. The only thing that is variable is the starting sound call
+number based on the order in which the bank is loaded.
+                                  
+
+Errors
+------
+
+Here is a quick list of the errors that can come up:
+
+
+* "ERROR: I/O port must be defined with SET VADR"
+
+  You must have the SPIEBUS I/O address set in your AUTOEXEC.BAT.
+
+
+* "ERROR: Cannot read .DAT file...."
+  "ERROR reading header in...."
+  "ERROR reading sound call address in...."
+  "ERROR reading ram address in...."
+  "ERROR reading number of banks in...."
+  "ERROR reading signature in...."
+  "ERROR reading .BNK name in...."
+  "ERROR reading .LST name in...."
+  "ERROR reading number of sound calls in...."
+  "ERROR reading size of bank in...."
+ 
+  There is a problem reading the file BANKLOAD.DAT.
+
+
+* "ERROR: Cannot find...."
+  "ERROR: Bank file ... not found."
+  "ERROR: List file ... not found."
+  "ERROR: Cannot read..."
+
+  One of the .BNK, .LST or .DAT is missing or can't be found.
+ 
+
+* "ERROR: Cannot open bank file...."
+  "ERROR: Cannot create listing file...."
+  "ERROR: Cannot open list file...."
+  "ERROR: Cannot create info file...."
+
+  One of the .BNK, .LST or .DAT files cannot be created for writing.
+
+
+* "ERROR reading signature string in...."
+  "ERROR reading playlist count in...."
+  "ERROR reading data size in...."
+  "ERROR reading offset table in...."
+
+  There is a problem reading one of the .BNK files.
+
+
+* "ERROR: Too many total sound calls ... (max ...)." 
+  "ERROR: Too many bank files (max of...)...."
+  "ERROR: Banks will not fit into RAM (... specified, ... available)."
+
+  There is a maximum of 16 banks per command line, a max of 4096
+  total loaded sound calls, and a max of 2 or 4 megabytes of RAM.
+
+
+* "ERROR: Timeout waiting for DSP to get load command."
+  "ERROR: Timeout waiting for DSP to get high word of start address."
+  "ERROR: Timeout waiting for DSP to get low word of start address."
+  "ERROR: Timeout waiting for DSP to get high word of end address."
+  "ERROR: Timeout waiting for DSP to get low word of end address."
+  "ERROR: Timeout waiting for checksum from DSP."
+  "ERROR: Bad checksum from DSP."
+
+  The above errors are caused by a communication problem with the
+  V+ board.
+
+
+
+
+
+
+
+
+
+
+               
+
+
+
+
+
+
+
+ 
+
+
+
+

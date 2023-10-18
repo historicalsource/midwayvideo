@@ -1,0 +1,2 @@
+void	*malloc(int); 
+

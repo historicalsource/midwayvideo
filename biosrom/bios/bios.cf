@@ -1,0 +1,11 @@
+-mhard-float
+-fno-builtin
+-mips4
+-fomit-frame-pointer
+-c
+-G 0
+-mcpu=r8000
+-nostdinc
+-Iinclude
+-MD
+-Wa,mips4

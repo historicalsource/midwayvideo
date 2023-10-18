@@ -1,0 +1,75 @@
+PGAS.DOC Version 1.0
+--------------------
+
+13 March 97
+
+PGAS is the Psy-Q/MIPS version of GASPEDAL. Ported over to GNU C
+compiler. Use PWAKE to unlock I/O ASIC and reset sound system. Use
+POSLOAD to download sound operating system. Use PBLOAD to download
+engine samples.
+
+**********************************************************************
+
+
+GASPEDAL.DOC
+
+Version 1.1 - 13 Feb 97
+-----------------------
+
+Changed over to Watcom. Added -v and -m options to set engine volume
+and master volume on command line. Added keys for selecting drones in
+addition to player sound. Made 'esc' and 'q' different - q leaves
+sounds running on exit (e.g. for debug).
+
+
+Version 1.0 - 7 Oct 96
+----------------------
+
+Simple utility to test / debug the DCS2 engine sound. Cabbaged
+together from QCOMM.
+
+Updates and sends out the following 3-word hex sound call sequence:
+
+55E0 ssvv 00pp
+
+ss = pitch or speed byte, 0=slowest, 255=fastest
+
+vv = volume byte for the engine sound (equivalent to track volume for a
+     normal compression track)
+   
+     0=off, 1=softest, 255=loudest
+
+pp = pan byte, 0=hard left, 127=middle, 255=hard right
+
+
+The following keyboard keys are assigned:
+
+
++  master volume up
+
+-  master volume down
+
+p  select player as current sound
+
+1  select drone1 as current sound
+
+2  select drone2 as current sound
+     
+l  pan left
+
+r  pan right
+
+e  toggle current sound on and off
+
+left cursor key - decrease pitch, slow down
+
+right cursor key - increase pitch, speed up
+
+up cursor key - increase volume
+
+down cursor key - decrease volume
+
+q or Q - quits but leaves sounds running (for debug)
+
+ESC - quits and turns off all sound
+

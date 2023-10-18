@@ -1,0 +1,110 @@
+#
+# Makefile for P.O.S.T.
+#
+PROJECT=	post
+PROJ_DIR=	.
+
+#Use only the suffixes we need
+.SUFFIXES:
+.SUFFIXES:	.c .d .h .S .o .cof
+
+#Set up the paths for the project file
+.PATH.cof = $(PROJ_DIR)
+.PATH.lib = $(PROJ_DIR)/lib
+.PATH.c = $(PROJ_DIR)/csrc
+.PATH.d = $(PROJ_DIR)/obj
+.PATH.h = $(PROJ_DIR)/inc
+.PATH.s = $(PROJ_DIR)/asrc
+.PATH.o = $(PROJ_DIR)/obj
+
+#Where to look for project dependencies
+vpath %.lib $(.PATH.lib)
+vpath %.cof $(.PATH.cof)
+vpath %.c $(.PATH.c)
+vpath %.d $(.PATH.d)
+vpath %.h $(.PATH.h)
+vpath %.S $(.PATH.s)
+vpath %.o $(.PATH.o)
+
+SIZE	= size
+NM		= nm
+CONVERT	= objcopy
+AS		= gasp
+CC		= gcc
+LD		= ld
+INC		= -I. -I$(.PATH.h) -I$(PROJ_DIR)/include
+LST		= -Wa,-L,-ahls=$(.PATH.o)/$(*F).LST
+
+DEFINES	= 
+
+ASX		= $(CC) -gcoff -mgas -fomit-frame-pointer -c -I$(INC) -G 0 -mcpu=r4600 -mips4 -EL
+AS2		= $(ASX) -O2 $(DEFINES)
+AS0		= $(ASX) -O0 $(DEFINES)
+CCX		= $(CC) -gcoff -mgas -fomit-frame-pointer -fno-builtin -fshort-double -c -I$(INC) -G 0 -DCLANGUAGE -mgp32 -mcpu=r4600 -mips3 -EL
+CC2		= $(CCX) -O2 $(DEFINES)
+CC0		= $(CCX) -O0 $(DEFINES)
+LF45	= -o $(PROJECT)45.cof -T $(PROJECT).ll -Map $(PROJECT)45.map
+LF51	= -o $(PROJECT)51.cof -T $(PROJECT).ll -Map $(PROJECT)51.map
+
+LIBS45	= $(addprefix $(.PATH.lib)/,libgl45.a libm.a)
+LIBS51	= $(addprefix $(.PATH.lib)/,libgl51.a libm.a)
+AOBJS   = bios.o
+COBJS	= main.o memtest.o dcs2test.o pictest.o fmemtest.o tmemtest.o idetest.o romtest.o \
+		  gprintf.o stdio.o nsc_415.o pcishim.o font8x8.o util.o version.o
+SOBJ	= crt0.o
+
+ADEPS   = $(addprefix $(.PATH.o)/,$(AOBJS:.o=.d))
+CDEPS	= $(addprefix $(.PATH.o)/,$(COBJS:.o=.d))
+SDEP	= $(addprefix $(.PATH.o)/,$(SOBJ:.o=.d))
+
+# Rule for the entire project
+all:	$(PROJECT)45.bin $(PROJECT)51.bin
+
+#Rule for the target executable
+$(PROJECT)45.bin: $(SOBJ) $(COBJS) $(AOBJS) $(LIBS45)
+	$(LD) $(LF45) $(addprefix $(.PATH.o)/,$(C2OBJS)) $(addprefix $(.PATH.o)/,$(COBJS)) $(addprefix $(.PATH.o)/,$(AOBJS)) $(LIBS45)
+	$(SIZE) -x $(PROJECT)45.cof
+	$(NM) -n $(PROJECT)45.cof > $(PROJECT)45.nm
+	$(CONVERT) -O srec $(PROJECT)45.cof $(PROJECT)45.sre 
+	$(CONVERT) -O binary $(PROJECT)45.sre $(PROJECT)45.bin
+
+$(PROJECT)51.bin: $(SOBJ) $(COBJS) $(AOBJS) $(LIBS51)
+	$(LD) $(LF51) $(addprefix $(.PATH.o)/,$(C2OBJS)) $(addprefix $(.PATH.o)/,$(COBJS)) $(addprefix $(.PATH.o)/,$(AOBJS)) $(LIBS51)
+	$(SIZE) -x $(PROJECT)51.cof
+	$(NM) -n $(PROJECT)51.cof > $(PROJECT)51.nm
+	$(CONVERT) -O srec $(PROJECT)51.cof $(PROJECT)51.sre 
+	$(CONVERT) -O binary $(PROJECT)51.sre $(PROJECT)51.bin
+
+#Rule to create the 'C' file dependencies
+$(.PATH.o)/%.d: %.c
+	$(CC) -MM $(INC) $< > $@
+
+#Rule to create the assembly file dependencies
+$(.PATH.o)/%.d: %.S
+	$(CC) -MM $(INC) $< > $@
+
+#Rule to build the 'C' object files
+$(COBJS):
+	$(CC0) $< -o $(.PATH.o)/$(@F)
+
+#Rule to build the assembly object files
+$(AOBJS):
+	$(AS0) $< -o $(.PATH.o)/$(@F)
+
+#Rule to build the assembly object files
+$(SOBJ):
+	$(AS0) $< -o $(.PATH.o)/$(@F)
+
+#Make the assemble and compile rules execute
+-include $(SDEP)
+-include $(CDEPS)
+-include $(ADEPS)
+
+clean:	clobber
+	-rm -f $(.PATH.o)/*.o
+	-rm -f $(.PATH.o)/*.d
+
+clobber:
+	-rm -f $(PROJECT).cof
+	-rm -f $(PROJECT).sre
+

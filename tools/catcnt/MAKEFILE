@@ -1,0 +1,71 @@
+#
+# Assorted directories
+#
+BUILDDIR=	..
+
+#
+# Include files everyone is dependant on
+#
+INCS=	$(INCDIR)/glide/glide.h
+
+#
+# C Source Modules
+#
+CSRCS=	catcnt.c
+
+#
+# Object Modules
+#
+OBJS=	$(CSRCS:.c=.o)
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/catcnt.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET)
+	@echo CATCNT DONE
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/catcnt.exe:	$(OBJS)
+	@gcc -O3 -o $(BUILDDIR)/catcnt.exe $(OBJS)
+
+#
+# Rules and dependencies
+#
+%.o:	%.c
+	@echo $< to $@ and $(basename $<).d
+	@gcc -MD -O3 -c -o $@ $<
+
+ifneq	($(wildcard *.d),)
+include	$(wildcard *.d)
+endif
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning catcnt
+	@if EXIST catcnt.o del catcnt.o
+	@if EXIST catcnt.d del catcnt.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering $(BUILDDIR)\catcnt.exe
+	@if EXIST $(BUILDDIR)\catcnt.exe del $(BUILDDIR)\catcnt.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding $(BUILDDIR)\catcnt.exe
+	@$(MAKE) --no-print-directory
+
+	

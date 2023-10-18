@@ -1,0 +1,91 @@
+#
+# Target directory for built item
+#
+BUILD_DIR=	/video/tools
+
+#
+# C Source for item
+#
+CSRCS=	cmdir.c
+
+#
+# Object module names for item
+#
+OBJS=	$(CSRCS:.c=.o)
+
+#
+# Dependency file names for item
+#
+DEPS=	$(CSRCS:.c=.d)
+
+#
+# Executables to be built
+#
+EXES=	$(addprefix $(BUILD_DIR)/, $(CSRCS:.c=.exe))
+
+#
+# Phoney targets
+#
+.PHONY:	all
+
+
+#
+# Default target
+#
+all:	$(DEPS)
+	@echo Making $(subst /,\,$(EXES))
+	@$(MAKE) --no-print-directory $(EXES)
+
+#
+# Rule to make dependendy files
+#
+%.d:	%.c
+	@gcc -M -o $@ $<
+
+#
+# Rule to make object files
+#
+%.o:	%.c
+	@gcc -O3 -c -o $@ $<
+
+#
+# Rule to make executable file
+#
+$(BUILD_DIR)/%.exe:	%.o
+	@gcc -O3 -o $@ $<
+
+
+#
+# Clean up for a re-link
+#
+clobber:
+	@echo Clobbering $(subst /,\,$(EXES))
+	@if EXIST $(subst /,\,$(EXES)) del $(subst /,\,$(EXES))
+
+
+#
+# Clean up for a recompile and link
+#
+clean:	clobber
+	@echo Cleaning $(subst /,\,$(BUILD_DIR))\$(basename $(CSRCS))
+ifneq	($(wildcard *.o),)
+	@-del *.o
+endif
+ifneq	($(wildcard *.d),)
+	@-del *.d
+endif
+
+
+#
+# Rebuild the whole works
+#
+rebuild:	clean
+	@$(MAKE) --no-print-directory
+
+
+#
+# Include the dependency files if they exist
+#
+ifneq	($(wildcard *.d),)
+include	$(wildcard *.d)
+endif

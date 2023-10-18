@@ -1,0 +1,82 @@
+#
+# Assorted directories
+#
+INCDIR=		/video/include/glide
+BUILDDIR=	..
+
+#
+# Include files everyone is dependant on
+#
+INCS=	$(INCDIR)/glide.h
+
+#
+# C Source Modules
+#
+CSRCS=	unix2dos.c
+
+#
+# Object Modules
+#
+OBJS=	$(CSRCS:.c=.obj)
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/unix2dos.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET) dummy
+
+#
+# Dummy target
+#
+dummy:
+	@echo UNIX2DOS DONE
+
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/unix2dos.exe:	$(OBJS)
+	@echo Linking $<
+	@gcc -O3 -I$(INCDIR) -o $(BUILDDIR)/unix2dos.exe $(OBJS)
+	@echo $(BUILDDIR)\unix2dos.exe built
+
+#
+# Rules and dependencies
+#
+%.d:	%.c
+	@echo Generating dependencies for $<
+	@gcc -M -I$(INCDIR) $< | sed 's/$*.o/&bj $@/g' > $@
+
+%.obj:	%.c
+	@echo Compiling $<
+	@gcc -c -O3 -I$(INCDIR) -o $@ $<
+
+include	$(CSRCS:.c=.d)
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning unix2dos
+	@if EXIST unix2dos.obj del unix2dos.obj
+	@if EXIST unix2dos.d del unix2dos.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering $(BUILDDIR)\unix2dos.exe
+	@if EXIST $(BUILDDIR)\unix2dos.exe del $(BUILDDIR)\unix2dos.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding $(BUILDDIR)\unix2dos.exe
+	@$(MAKE) --no-print-directory
+
+	

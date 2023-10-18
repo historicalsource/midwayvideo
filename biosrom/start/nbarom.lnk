@@ -1,0 +1,19 @@
+
+	org	$bfc00000
+
+text	group	org($bfc00000)
+data	group	
+bss	group	org($80000000),bss
+
+	section.p .text,text
+	section.p .rdata,text
+	section.p .ctors,text
+	section.p .dtors,text
+	section.p .data,data
+	section.p .sdata,data
+	section.p .sbss,bss
+	section.p .bss,bss
+
+	include	"nbacsu.o"
+	include	"gt64010.o"
+

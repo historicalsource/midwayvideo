@@ -1,0 +1,15 @@
+-D__DJGPP__
+-D__GOOSE__
+-mhard-float
+-fno-builtin
+-mips4
+-fomit-frame-pointer
+-c
+-G 0
+-mcpu=r8000
+-nostdinc
+-Iinclude
+-I\video\include
+-I\video\include\glide244
+-MD
+-Wa,mips4

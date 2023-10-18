@@ -1,0 +1,22 @@
+SCC = This is a Source Code Control file
+
+[b99rom.mak]
+SCC_Project_Name = "$/video/biosrom/start", NFEAAAAA
+
+[carnrom.mak]
+SCC_Project_Name = "$/video/biosrom/start", NFEAAAAA
+
+[nbarom.mak]
+SCC_Project_Name = "$/video/biosrom/start", NFEAAAAA
+
+[nflrom.mak]
+SCC_Project_Name = "$/video/biosrom/start", NFEAAAAA
+
+[sa1rom.mak]
+SCC_Project_Name = "$/video/biosrom/start", NFEAAAAA
+
+[srrom.mak]
+SCC_Project_Name = "$/video/biosrom/start", NFEAAAAA
+
+[vegasrom.mak]
+SCC_Project_Name = "$/video/biosrom/start", NFEAAAAA

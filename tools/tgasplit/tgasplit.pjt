@@ -1,0 +1,81 @@
+;Codewright Project File (do not remove or modify this line)
+[ProjInit]
+ProjSetConfigFlags=0x04010940
+ProjCheckPath='D:\video\tools\tgasplit\\'
+
+[Files]
+D:\video\tools\tgasplit\tgasplit.c
+
+
+[State]
+SysSetCwd='D:\video\lib'
+SrchSetFlags=0x041000eb
+FileSortMode=0x1
+StateWindowFrame=59,9,851,703,0x630dffca
+_StateWindow=0,0,886,308,0x0810001c,'D:\video\Nba\select.c',240,15,244,135,172,12,46,187,126,176,8,4294967295,4294967295,1,0,'Courier New',4294967283,0,49,0,10,499,0,0,753,252,249,1292,45,400,0,244,246,242,252,753,753,752,761,253,0,0,253,224,14,1275,1,208,1,6
+_StateWindow=135,135,886,308,0x0810000c,'D:\video\Nba\mainproc.c',240,15,244,135,172,12,46,187,126,176,8,4294967295,4294967295,0,0,'Courier New',4294967283,0,49,0,10,499,0,0,753,252,249,1089,22,400,0,244,246,242,252,753,753,752,761,253,0,0,253,224,14,1080,1,208,2,6
+_StateWindow=108,108,886,308,0x0810000c,'D:\video\Nba\dribbler.c',240,15,244,135,172,12,46,187,126,176,8,4294967295,4294967295,0,0,'Courier New',4294967283,0,49,0,10,499,0,0,753,252,249,602,103,400,0,244,246,242,252,753,753,752,761,253,0,0,253,224,14,589,1,208,3,6
+_StateWindow=0,221,799,221,0x0810000c,'D:\video\tools\reseq\RESEQ.C',240,15,244,135,172,12,46,187,126,176,8,4294967295,4294967295,0,0,'Courier New',4294967283,0,49,0,10,499,0,0,753,252,249,215,59,400,0,244,246,242,252,753,753,752,761,253,0,0,253,224,14,207,1,208,4,6
+_StateWindow=54,54,886,308,0x0810000c,'D:\video\Nba\movies\makefile',240,15,244,135,172,12,46,187,126,176,8,4294967295,4294967295,0,0,'Courier New',4294967283,0,49,0,10,499,0,0,753,252,249,38,19,400,0,244,246,242,252,753,753,752,761,253,0,0,253,224,14,25,1,208,5,6
+_StateWindow=81,81,886,308,0x0810000c,'D:\video\tools\movie\movie.c',240,15,244,135,172,12,46,187,126,176,8,4294967295,4294967295,0,0,'Courier New',4294967283,0,49,0,10,499,0,0,753,252,249,638,48,400,0,244,246,242,252,753,753,752,761,253,0,0,253,224,14,624,1,208,6,6
+_StateWindow=0,0,799,221,0x0810000c,'D:\video\tools\tgasplit\tgasplit.c',240,15,244,135,172,12,46,187,126,176,8,4294967295,4294967295,0,0,'Courier New',4294967283,0,49,0,10,499,0,0,753,252,249,43,20,400,0,244,246,242,252,753,753,752,761,253,0,0,253,224,14,35,1,208,7,6
+_StateWindow=54,54,886,308,0x0810000c,'D:\video\Nba\Include\sndcalls.h',240,15,244,135,172,12,46,187,126,176,8,4294967295,4294967295,0,0,'Courier New',4294967283,0,49,0,10,499,0,0,753,252,249,173,3,400,0,244,246,242,252,753,753,752,761,253,0,0,253,224,14,159,1,208,8,6
+_StateBuffer='D:\video\tools\tgasplit\tgasplit.c',0x0400048e,43,20,25,'5 9','',0x0,'',1,72,0
+_StateBuffer='D:\video\tools\movie\movie.c',0x0400048e,638,48,25,'5 9','',0x0,'',1,72,0
+_StateBuffer='D:\video\Nba\movies\makefile',0x0400048e,38,19,25,'5 9','',0x0,'',1,72,0
+_StateBuffer='D:\video\tools\reseq\RESEQ.C',0x0400048e,215,59,25,'5 9','',0x0,'',1,72,0
+_StateBuffer='D:\video\Nba\dribbler.c',0x0c00048e,602,103,25,'5 9','',0x0,'',1,72,0
+_StateBuffer='D:\video\Nba\mainproc.c',0x0400048e,1089,22,25,'5 9','',0x0,'',1,72,0
+_StateBuffer='D:\video\Nba\select.c',0x0c00048e,1292,45,25,'5 9','',0x0,'',1,72,1
+_StateBuffer='D:\video\Nba\Include\sndcalls.h',0x0400048e,26,1,25,'5 9','',0x0,'',1,72,0
+_StateHistory=FILELIST,'D:\video\Nba\mainproc.c','D:\video\Nba\select.c','d:\video\lib\goose\GFADER.C','D:\video\Nba\sounds.c','D:\video\Nba\Include\sndcalls.h','D:\video\lib\sound\sound.c','d:\video\nba\nba.c','d:\video\lib\goose\switch.c','\\\Jon_hey\nbanbc_sndbk\MOV_STAR.def'
+_StateHistory=SEARCH,'fprin','coul','system','offset','attr','rc','sound','gameplay_bnk_str','pre','snd_bank_load'
+_StateHistory=REPLACE,'return','tgaspllit','tgasplit'
+_StateHistory=XSYMBOL,'tga_split','normal_screen','AHH_PAIN','VOLUME1','PRIORITY_LVL1','game_proc','get_player_sw_current'
+_StateHistory=EDITFILE,'D:\video\tools\reseq\RESEQ.C','D:\video\tools\reseq\MAKEFILE','D:\video\Nba\movies\makefile','D:\video\tools\movie\movie.c','D:\video\Nba\dribbler.c','D:\video\Nba\select.c','D:\video\Nba\sounds.c','D:\video\Nba\Include\sndcalls.h'
+_StateHistory=GOTOLINE,'58'
+_StateHistory=FGREP,'ffblk','gameplay_bnk_str','snd_bank_load'
+_StateHistory=GREPSCOPE,'*.h','*.c;*.h'
+_StateHistory=FGREPDIR,'D:\video\include','D:\video\nba','D:\video\lib'
+_StateMark=MARK_POSITION,1,'D:\video\tools\tgasplit\tgasplit.c',51,14,0,'',0
+_StateMark=MARK_POSITION,2,'D:\video\tools\tgasplit\tgasplit.c',52,45,0,'',0
+_StateMark=MARK_POSITION,3,'D:\video\tools\tgasplit\tgasplit.c',55,42,0,'',0
+_StateMark=MARK_POSITION,4,'D:\video\tools\tgasplit\tgasplit.c',59,18,0,'',0
+_StateMark=MARK_POSITION,1,'D:\video\Nba\select.c',1267,17,0,'',0
+
+[Editor]
+VCSProject='"$/video", BAAAAAAA'
+VCSProjectPath='C:\PROGRAM FILES\DEVSTUDIO\VSS,'
+VCSProjectLocalPath='D:\video'
+ClipboardSetTermStr='\r\n',0
+ClipboardEnableTermStr=1
+ClipboardSetSepStr='\r\n',0
+ClipboardEnableSepStr=1
+ScrapSetCount=1
+
+[Compiler]
+TagSetCmd='${HOME}${WTAGS} -oc -d -t${TAGFILE}.tag -p${TAGFILE}.ptg',0x8000060
+BrowseSetFile='D:\video\tools\tgasplit\tgasplit.ptg'
+TagSetFile='D:\video\tools\tgasplit\tgasplit.tag'
+CompilerAddCmd='$_cw_proj_hash_$','',1073741904,'',80,'${FTEE} make',176,'${FTEE} nmake',176,'',0,'',0,'_ErrorInfoDefault','','','proj.err','%x'
+CompilerAddResponse='$_cw_proj_hash_$',
+CompilerNewExt=.htm
+CompilerNewExt=.pas
+CompilerNewExt=.ini
+CompilerNewExt=.html
+CompilerNewExt=.txt
+
+[VersionControl:PVCS]
+VCSSetCmd=VCS_CHECKIN_ID,'put -n -T@%Q -M@%Q %b%e',0x8000040
+VCSSetCmd=VCS_CHECKINLOCK_ID,'put -n -T@%Q -M@%Q -l %b%e',0x8000040
+VCSSetCmd=VCS_CHECKOUT_ID,'get -y %b%e',0x8000040
+VCSSetCmd=VCS_CHECKOUTLOCK_ID,'get -y -l %b%e',0x8000040
+VCSSetCmd=VCS_CHECKLOCK_ID,'vcs -y -l %b%e',0x8000040
+VCSSetCmd=VCS_CHECKUNLOCK_ID,'vcs -y -u %b%e',0x8000040
+VCSSetCmd=VCS_CHECKLABEL_ID,'vcs -y -v"${VCSLABEL}" %b%e',0x8000040
+VCSSetCmd=VCS_CHECKLOG_ID,'vlog %b%e',0x8000040
+VCSSetCmd=VCS_CHECKPROP_ID,'vlog -b %b%e',0x8000040
+VCSSetCmd=VCS_CHECKDIFF_ID,'vdiff -r %b%e',0x8000040
+VCSSetCmd=VCS_CHECKMENU_ID,'pvcsvmwn',0x8000000
+VCSSetCmd=VCS_ADD_ID,'vcs -i -t@%Q %b%e',0x8000040
+VCSSetCmd=VCS_REMOVE_ID,'del /f %b%{??v|___}e',0x8000040

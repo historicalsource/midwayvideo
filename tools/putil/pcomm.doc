@@ -1,0 +1,405 @@
+PCOMM.DOC
+
+Version 1.0 (11 March 97)
+-------------------------
+
+Created new name and directory for PCOMM, which is the 32-bit 
+version of QCOMM. Made changes necessary to compile code with the
+GNU compiler. Ripped out any code not pertinent to DCS2 (e.g. all
+stuff for PC plugin card for pinball, etc).
+
+Here are the command line options that are valid for this DCS2/MIPS
+version:
+
+-g      "one shot" mode, sends sound call with no output
+        designed to be used when called from Brief macro, etc.
+
+-d      sound calls entered and displayed in decimal (default)
+
+-h      all values in hex, no prefixes when entering values
+
+-p      debug mode that shows every word going over to sound system
+
+
+It should be fairly clear in the rest of this doc which options apply
+to the DCS2 dynamic track allocation system and which are vestigial
+from the old pinball days.
+
+Many of the commands for the streaming and engine sound commands must
+be explicitly typed in hex. See the latest DCS2 docs for lists of
+those commands.
+
+----------------------------------------------------------------------
+
+
+* Version 3.6F (25 Sep 96)
+--------------------------
+
+Fixed bug so that the error signal for "sound call not allocated"
+gets correctly interpreted and gives the message "no sound call
+there". This occures, for example, if you make sound call 5 but have
+no sound call 5 loaded. This only applies to V+ mode (-c option).
+
+Changed delay times between back-to-back sound calls sent out by some
+macros to work with newer 166 MHz pentiums.
+
+
+* Version 3.6E (13 Dec 95)
+--------------------------
+
+Added the ability to "shell out" to DOS. Type "dos" at the qcomm>
+prompt, and then you will be prompted for a DOS command line. Type in
+the command line you want and hit return. QCOMM will "shell out" and
+run the command.
+
+Note that this shells out to DOS, and not to Polyshell, so you can't
+run .SH or Thompson Toolkit routines, only valid DOS commands.
+
+The intended use is so you can do BANKLOAD or LOADRAM from within
+QCOMM, e.g. ...
+
+qcomm> dos
+       enter DOS command: loadram -q 0=U2.ROM
+
+ (ROM gets loaded here)
+
+qcomm> 3
+
+...and then you can send sound calls.
+
+In order to make this work, I had to get rid of the "o" keyhit
+commands - hitting the "o" key used to increment the track 3 pan.
+That was not used much (never) so no big deal.
+
+NOTE: The QCOMM.C code has become a complete mess. The COMM.C
+routines are clean and fine, but the main flow of QCOMM.C is a
+disaster because of all the quick mods to support all the 8,389,433
+different sound boards. SOMEBODY NEEDS TO REWRITE THIS CODE WITH A
+NEW SLICK VISUAL FRONT END! 13 Dec 95 - mb
+
+
+* Version 3.6D (9 Nov 95)
+-------------------------
+
+Increased reset time out values for Zabriskie Pentium plug-in card.
+
+
+* Version 3.6C (18 Aug 95)
+
+Changed to match sound call scheme updates regarding 
+
+- no tracks available
+- null table entry
+
+* Version 3.6B (8 Aug 95)
+
+Changed the priority word to conform to the new spec. 
+
+
+* Version 3.6A (3 Aug 95)
+
+This version adds some stuff that is mostly useful for debugging and
+could probably be done a bit moe gracefully for the casual user, but
+it's needed stuff so here it is...
+
+
+Added "interpreted" read back for V+ dynamic -C mode. For each sound
+call sent, the V+ returns info about which tracks the sound call used
+and which tracks got interrupted. This is now correctly displayed and
+interpreted.
+
+
+Also... In dynamic mode, each sound call is three words, and contains the
+volume, pan and priority for the sound call. QCOMM defaults to
+setting the host track volume to 255 (loudest and also the power up
+default), the pan to 127 (middle), and the priority to 0 (always
+plays). If, for debugging or checking out some mode, you want to
+change the running values sent out for this, then use one of the
+three things below that can be typed after the QCOMM prompt...
+
+sp N - Sets the running pan (which can be 0 to 127).
+       
+sv N - Sets the running volume to N (which can be 0 to 255).
+
+sr N - Sets the running priority to N (which can be 0 to 127).
+
+
+Also... Added ability to type x NNNN NNNN NNNN etc. at QCOMM prompt
+when in V+ dynamic mode. This causes all numbers typed after the x
+(must be lower case) to be interpreted as straight 16-bit words to be
+sent out, with no extra words or handshaking sent out (e.g. no volume
++ pan word). This is msotly for debugging.
+
+
+Version 3.6 (20 July 95)
+------------------------
+
+* Version 3.6
+
+Changes to support V+ dynamic track allocation. Supports changes to
+the V+ sound call interface, most of which is transparent to the
+user.
+
+Use the -C option to invoke the new V+ interface. Note that this
+works in 16-bit wide mode by default, so the -U option is no longer
+needed. To use the older V+ interface, you must still use both the -K
+option (select V+) and the -U option (select 16-bit wide).
+
+Added s0, s1 ... s7 to stop a track. This uses the V+ reserved call
+$55AE to stop a track.
+
+QWERTY key presses (Y/H, U/J, I/K, O/L) do NOT adjust the pans in
+dynamic mode (vestigial feature anyway).
+
+When the -C option is used, return values from the V+ are parsed to
+show either signals or track used/interrupted info.
+
+-P option added to print actual hex words being sent out when in any
+of the V+ modes. This is for debug. * This replaces the -P option
+that used to invoke the QWERTY key presses for adjusting pan, which
+nobody ever used. *
+
+
+Version 3.5 (9 May 95)
+----------------------
+
+Bumped up rev level to keep track of consolidation... brought the new
+I/O ASIC stuff for the V+ back into the "real" QCOMM (they had
+separate development paths for a while).
+
+
+Version 3.4B (29 Mar 95)
+------------------------
+
+Added read-back support for WWF-Unit. QCOMM now can read back 8-bit signals
+from the WWF-Unit sound section. This can be used to check 999 rev
+level, sanity bytes, etc. Also added master volume set support so
+that if the $79 and $01 sequence comes back (sanity byte plus one
+bong) then the master volume is set to 50 (decimal)... which Flanders
+says is "comfortable for office listening."
+
+
+Version 3.4A (17 Mar 95)
+-----------------------
+
+Added -u option to send sound calls to V+ in 16-bit mode. A 16-bit
+call is sent as a straight 16-bit word.
+
+
+Version 3.4 (13 Feb 95)
+-----------------------
+
+Added (finally) support for track volume and track panning for tracks
+5, 6, 7 and 8. Now you can type in p5 200 or v6 190 etc... no hot
+keys for these... no room on QWERTY, but nobody uses those anyway.
+
+
+Version 3.3 (23 Jan 95)
+-----------------------
+
+Added support for V+ system via the SPIEBUS card for V+ development.
+This is done using the -k option (arbitrary... running out of
+letters). This assumes/requires that you have loaded up the XILINX
+with XIL.EXE VRHOST2.RBT and that you have setup/unlocked the V+ I/O ASIC
+with something like VWAKE.EXE.
+
+Note that this sends a 16-bit sound call as two 8-bit bytes (so it
+works with current sound op sys structure).
+
+
+Version 3.2b (6 Dec 94)
+-----------------------
+
+Added -s option for incrementing/decrementing through sound calls by
+an arbitrary amount. Use -sxxx to set the skip amount and then use
+the < and > keys (shift-comma and shift-period) to jump up or down by
+the number xxx. For example, -s3 would take you through calls 1, 4,
+7, 10... and would be useful if you had all sound calls on three
+tracks.
+
+Added -g option to allow one shot sound calls. Use -gxxx to send
+sound call xxx with no screen output. The sound call is sent and then
+the program exits. Any other parameters about what type of sound
+board you're using, hex or decimal mode, etc. should precede this
+option. This will NOT work if you try to reset the board, send an
+intial master volume, etc. For example, -g10 would send sound call 10
+and then exit.
+
+The -g option lets you use qcomm to send calls from within a Brief
+macro, or within a batch file, etc. whenever you don't want screen
+output or typing.
+
+
+Version 3.2a (5 Oct 94)
+-----------------------
+
+Added -b option for use with video boards. Skips diagnostics and sets
+master volume right away. Usage is:
+
+qcomm -bxxx
+
+where xxx is the decimal master volume you want. Example:
+
+qcomm -b200 skips diagnostic bongs and sets master volume to 200
+
+Support for this feature already existed for the internal plug-in
+cards - once the sanity byte came back the master volume was set.
+This is for use with external or GSP-based sound boards that have no
+talk back to the PC.
+
+Version 3.2 (1 June 94)
+-----------
+
+Added support for WWF-Unit GSP video board. This has different
+addresses than the T-Unit. This is accessed with the -w command line
+option. The typical command line will probably be "qcomm -w -q"...
+the -w to signal WWF addresses and the -q to suppress reset.
+
+
+Version 3.1 (11 April 94)
+-----------
+
+QCOMM is the software that sends sound calls and communicates with a
+sound board from the PC. Its main purposes are to send sound calls to
+the PC plug-in sound card and to emulate the communications between a
+sound board and a video or pinball game.
+
+The typical command line for sending sound calls to the PC plug-in
+sound card is "qcomm -d -i". The "-d" sets the working mode to
+decimal (all numbers entered and printed in decimal) and the "-i"
+indicates the internal PC plug-in sound card.
+
+Sound calls are sent by typing the sound call number at the "QCOMM>"
+prompt and hitting return. Signals sent back by the PC plug-in sound
+card are printed as they are recieved. Hitting escape or typing
+"q" quits.
+
+
+COMMAND LINE OPTIONS
+--------------------
+
+* You can have as many command line options as you want, e.g.
+
+  qcomm -e -h -p
+  qcomm -d
+  qcomm -e -f -d -q
+
+  doesn't matter which order or how many.
+
+
+-d      sound calls and all other information typed and displayed in
+decimal 
+
+-h      sound calls and all other information typed and displayed in
+hexadecimal
+
+-i      use internal PC plug-in sound board
+
+-e      use external sound board via parallel port
+
+-t      use T-Unit port to talk to external sound board
+
+-a      use T-Unit aux port to talk to external sound board
+
+-x      use X-Unit port to talk to sound board (not yet implemented)
+
+-w      use WWF-Unit port to talk to sound board via GSP
+
+-k      use SPIEBUS card to talk to V+ I/O ASIC
+        intended for V+ development... 23 Jan 95 - mb
+
+-r      reset the sound board (internal only) at start of qcomm
+
+-q      do not do any reset
+
+-f      "fast mode"... does not look for signals or return values
+from the sound board and only allows one call per line... mostly only
+for debugging situations
+
+-p      y/g u/h i/j o/k keys control panning instead of volume
+
+-v      y/g u/h i/j o/k keys control volume instead of panning
+
+
+FUNCTIONS
+---------
+
+The following are key hits or lines that get typed at the qcomm>
+prompt.
+
++/- keys        increments/decrements master volume
+
+
+if "volume mode" specified on command line with -v option:
+
+        y/g keys        increments/decrements track 0 volume
+
+        u/h keys        increments/decrements track 1 volume
+
+        i/j keys        increments/decrements track 2 volume
+
+        o/k keys        increments/decrements track 3 volume
+
+
+if "pan mode" specified on command line with -p option:
+
+        y/g keys        increments/decrements track 0 pan
+
+        u/h keys        increments/decrements track 1 pan
+
+        i/j keys        increments/decrements track 2 pan
+
+        o/k keys        increments/decrements track 3 pan
+
+Note that as of 23 Jan 95... there are no keys for adjusting the
+volume or pan of any tracks greater than 3. If you are using a system
+that supports 6 or 8 tracks (WWF video, new pin A/V, V+) then you can
+use the explicit settings described below e.g. p6 124 to set track 6
+pan to 124.
+
+vm NNN          sets master volume to NNN (0 to 255)
+
+vX NNN          sets track X to volume NNN (0 to 255)
+
+pX NNN          sets track X pan setting to NNN (0=left 255=right)
+
+r/R             resets internal PC plug-in sound card
+
+. (period)      increments last sound call sent by one
+
+, (comma)       decrements last sound call sent by one
+
+q/Q             quits qcomm
+
+escape          quits qcomm
+
+
+* There can be up to 8 sound calls on one line (except in fast mode).
+
+* For anything other than sound calls, there can be only one command
+per line (e.g. vm240 is ok but vm240 v0 125 is not).
+
+* Hitting return sends out the last sound call sent. If there were
+multiple sound calls on one line, then the last sound call sent is
+the last one on that line.
+
+* Hitting return right away when the program starts will send a single
+byte and cancel diagnostics. Remember that the sound board resets to
+volume 103 (decimal) out of 255 (decimal).
+
+* If QCOMM gets the $79 $01 sequence back from the plug-in card
+indicating that everything is working OK, then it will automatically
+set the volume to 240 (decimal).
+
+* Keep in mind that the parallel port can be flaky. You can't send
+sound calls out as fast as you can to the plug-in card, and you might
+miss calls if you send them out too fast. If QCOMM is running in
+external mode, then it adds more delay between sound calls to
+compensate.
+
+* QCOMM is set up for the PC parallel port address to be at 378h.
+Other addresses and constants are in the file "defines.h"
+
+
+
+

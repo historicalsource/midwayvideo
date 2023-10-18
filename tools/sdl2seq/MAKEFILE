@@ -1,0 +1,89 @@
+#
+# Assorted directories
+#
+BUILDDIR=	..
+
+#
+# Include files everyone is dependant on
+#
+INCS= lookup.h
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/sdl2seq.exe lookup.h
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET) dummy
+
+#
+# Dummy target
+#
+dummy:
+	@echo SDL2SEQ DONE
+
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/sdl2seq.exe:	sdl2seq.obj crc.obj
+	@echo Linking SDL2SEQ.EXE
+	@gcc -O3 -Wall -o $@ sdl2seq.obj crc.obj
+	@echo SDL2SEQ.EXE built
+
+lookup.h:	lookup.exe
+	@echo Generating $@
+	@lookup > lookup.h
+	@echo $@ built
+
+lookup.exe:	lookup.obj
+	@echo Linking $@
+	@gcc -O3 -Wall -o $@ lookup.obj
+	@echo $@ built
+
+%.d:	%.c
+	@echo Generating Dependencies for $<
+	@gcc -M $< | sed 's/$*.o/&bj $@/g' > $@
+
+%.c:	%.l lookup.h
+ifneq ($@,lookup.c)
+	@echo Generating source file $@
+	@flex -o$@ $<
+endif
+
+%.obj:	%.c
+	@echo Compiling $<
+	@gcc -c -Wall -O3 -o $@ $<
+
+include	crc.d
+include	sdl2seq.d
+include	lookup.d
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning sdl2seq
+	@if EXIST lookup.exe del lookup.exe
+	@if EXIST sdl2seq.obj del sdl2seq.obj
+	@if EXIST sdl2seq.c del sdl2seq.c
+	@-del *.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering sdl2seq
+	@if EXIST $(BUILDDIR)\sdl2seq.exe del $(BUILDDIR)\sdl2seq.exe
+	@if EXIST lookup.h del lookup.h
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding sdl2seq
+	@$(MAKE) --no-print-directory
+
+	

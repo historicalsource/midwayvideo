@@ -1,0 +1,82 @@
+#
+# Assorted directories
+#
+INCDIR=		/video/include/glide
+BUILDDIR=	..
+
+#
+# Include files everyone is dependant on
+#
+INCS=	$(INCDIR)/glide.h
+
+#
+# C Source Modules
+#
+CSRCS=	romsum.c
+
+#
+# Object Modules
+#
+OBJS=	$(CSRCS:.c=.obj)
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/romsum.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET) dummy
+
+#
+# Dummy target
+#
+dummy:
+	@echo ROMSUM DONE
+
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/romsum.exe:	$(OBJS)
+	@echo Linking $<
+	@gcc -O3 -I$(INCDIR) -o $(BUILDDIR)/romsum.exe $(OBJS)
+	@echo $(BUILDDIR)\romsum.exe built
+
+#
+# Rules and dependencies
+#
+%.d:	%.c
+	@echo Generating dependencies for $<
+	@gcc -M -I$(INCDIR) $< | sed 's/$*.o/&bj $@/g' > $@
+
+%.obj:	%.c
+	@echo Compiling $<
+	@gcc -c -O3 -I$(INCDIR) -o $@ $<
+
+include	$(CSRCS:.c=.d)
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning romsum
+	@if EXIST romsum.obj del romsum.obj
+	@if EXIST romsum.d del romsum.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering $(BUILDDIR)\romsum.exe
+	@if EXIST $(BUILDDIR)\romsum.exe del $(BUILDDIR)\romsum.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding $(BUILDDIR)\romsum.exe
+	@$(MAKE) --no-print-directory
+
+	

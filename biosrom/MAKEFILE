@@ -1,0 +1,18 @@
+#
+# Top level makefile for boot rom stuff
+#
+# $Revision: $
+#
+# NOTE - In this makefile bios MUST always preceed start
+#
+all:
+	@$(MAKE) --no-print-directory -C start
+
+clobber:
+	@$(MAKE) --no-print-directory -C start clobber
+
+clean:
+	@$(MAKE) --no-print-directory -C start clean
+
+rebuild:
+	@$(MAKE) --no-print-directory -C start rebuild

@@ -1,0 +1,72 @@
+#
+# Assorted directories
+#
+BUILDDIR=	..
+INCDIR=		/video/include
+
+#
+# Include files everyone is dependant on
+#
+INCS=	$(INCDIR)/glide/glide.h
+
+#
+# C Source Modules
+#
+CSRCS=	bin2exe.c
+
+#
+# Object Modules
+#
+OBJS=	$(CSRCS:.c=.o)
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/bin2exe.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET)
+	@echo BIN2EXE DONE
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/bin2exe.exe:	$(OBJS)
+	@gcc -O3 -o $(BUILDDIR)/bin2exe.exe $(OBJS)
+
+#
+# Rules and dependencies
+#
+%.o:	%.c
+	@echo $< to $@ and $(basename $<).d
+	@gcc -I$(INCDIR) -MD -O3 -c -o $@ $<
+
+ifneq	($(wildcard *.d),)
+include	$(wildcard *.d)
+endif
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning bin2exe
+	@if EXIST bin2exe.o del bin2exe.o
+	@if EXIST bin2exe.d del bin2exe.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering $(BUILDDIR)\bin2exe.exe
+	@if EXIST $(BUILDDIR)\bin2exe.exe del $(BUILDDIR)\bin2exe.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding $(BUILDDIR)\bin2exe.exe
+	@$(MAKE) --no-print-directory
+
+	

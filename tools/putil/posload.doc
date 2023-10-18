@@ -1,0 +1,256 @@
+POSLOAD.DOC
+
+Version 1.0 12 March 97
+-----------------------
+
+This is the Psy-Q/MIPS version of OSLOAD. This program downloads the
+DCS2 operating system to the sound system. Before this can be done,
+you have to unlock the I/O ASIC and reset the sound system, using the
+program PWAKE.
+
+On reset, the DCS2 sound system wakes up with a boot monitor ROM
+running. The host must download the actual sound operating system.
+
+Because the sound system has two types of memory (24-bit program and
+16-bit data) in two locations (internal and external), the operating
+system is broken down into four files:
+
+_COMP.BIN (or COMP.BIN)         program memory, data compression code
+_OSYS.BIN (or OSYS.BIN)         program memory, operating system
+DM_EXT.BIN                      external data memory image
+DM_INT.BIN                      internal data memory image
+
+
+All four of these files need to be downloaded. The suggested method
+is to set up a batch file, e.g.:
+
+        osload d:/video/lib/r50snd/comp.bin   2800 37FF 0 0
+        osload d:/video/lib/r50snd/osys.bin   0000 03FF 0 0
+        osload d:/video/lib/r50snd/dm_ext.bin 0800 37FF 1 0
+        osload d:/video/lib/r50snd/dm_int.bin 3800 39FF 1 0
+        osload run
+
+The numbers are the load addresses and flags for memory type. The
+command line option "run" sends the command to the sound monitor boot
+ROM to start executing the downloaded code.
+
+
+**********************************************************************
+
+
+Version 1.2
+-----------
+
+17 Aug 95
+
+
+Added ability to type in explicit path names. If the file name given
+is an actual path, e.g. C:/SOUNDS/BIN/_OSYS.BIN then it will use
+that, otherwise it looks in the current working directory.
+
+
+Quick Guide to Loading V+ Sound Operating System
+------------------------------------------------
+
+21 June 95
+
+Here are the adresses:
+
+#define SOUND_DATA_WRITE 0x990009 - write to the sound DSP
+#define SOUND_DATA_READ 0x99000B - read from the sound DSP
+#define SOUND_STATUS 0x99000A - status port to check if data has been read
+
+Here are the bits to check to see if the data has cleared:
+
+#define HOST_TO_SOUND 0x0080 
+#define SOUND_TO_HOST 0x0040
+
+
+// The basic flow is:
+// 1. DSP sends host a 0x000A as a signal "I am ready"
+// 2. Host sends DSP a 0x001A as a command "Here comes the shit"
+// 3. Host sends 16-bit start address                 
+// 4. Host sends 16-bit end address
+// 5. Host sends 16-bit memory type
+// 6. Host sends all data
+// 7. Host waits for 16-bit checksum back
+// 8. If all has been loaded, host sends DSP a 0x002A as a command 
+//    to start executing the code that has been loaded
+
+
+TO LOAD CODE:
+
+There are two different types of memory on the DSP: 24-bit program
+memory and 16-bit data memory.
+
+These are the memory types sent to the DSP:
+
+#define PROGRAM_MEMORY 0
+#define DATA_MEMORY_0 1 
+#define DATA_MEMORY_1 2
+
+Here is the memory layout of the sound DSP:
+
+internal on-chip 16-bit data memory, 512 words                  
+internal on-chip 24-bit program memory, 1024 words              
+external S/RAM 24-bit program memory, 14k words                 
+external S/RAM 16-bit data memory bank zero, 8k words           
+external S/RAM 16-bit data memory bank one, 8k words            
+
+
+1. read SOUND_STATUS until the SOUND_TO_HOST bit clears:
+
+   vread (SOUND_STATUS, &temp1);
+   while (!(temp1 & SOUND_TO_HOST))
+
+2. when it clears, read the data (16-bit word):
+
+   vread (SOUND_DATA_READ, &temp2);
+
+3. manually clear the bit:
+
+   vwrite (SOUND_DATA_READ, CLEAR_READ_INTERRUPT);
+
+4. make sure you got back 0x000A
+
+
+5. send the start download command and wait for it to get read
+
+ vwrite (SOUND_DATA_WRITE, 0x001A);
+ vread (SOUND_STATUS, &temp1);
+ while (!(temp1 & HOST_TO_SOUND))
+
+6. send the starting address and wait for it to get read
+
+ vwrite (SOUND_DATA_WRITE, start_address);
+ vread (SOUND_STATUS, &temp1);
+ while (!(temp1 & HOST_TO_SOUND))
+
+7. send the ending address, this defines the # of words to load, wait
+   for it to be read
+
+ vwrite (SOUND_DATA_WRITE, end_address);
+ vread (SOUND_STATUS, &temp1);
+ while (!(temp1 & HOST_TO_SOUND))
+
+8. send the memory type, wait for it to be read
+
+ vwrite (SOUND_DATA_WRITE, memory_type);
+ vread (SOUND_STATUS, &temp1);
+ while (!(temp1 & HOST_TO_SOUND))
+
+
+9. for each word of data to be sent over:
+
+----------------------------------------------------------------------
+
+If the word size is 24-bits:
+
+A. wait for the port to clear up
+   vread (SOUND_STATUS, &temp1);
+   while (!(temp1 & HOST_TO_SOUND))
+
+B. 24-bit data is sent as TWO separate 16-bit words:
+   24-bit data is three bytes: usb | msb | lsb
+
+   first word sent over: usb | msb
+   vwrite (SOUND_DATA_WRITE, first_word);
+   checksum += first word;
+
+   make sure first word made it over:
+   vread (SOUND_STATUS, &temp1);
+   while (!(temp1 & HOST_TO_SOUND))
+
+   second word sent over: 0xFF | lsb
+   vwrite (SOUND_DATA_WRITE, second_word);
+   checksum += second word;
+
+   make sure second word made it over:
+   vread (SOUND_STATUS, &temp1);
+   while (!(temp1 & HOST_TO_SOUND))
+
+
+NOTE: In 24-bit mode:
+
+1. The checksum is the running sum OF THE ACTUAL 16-BIT WORDS
+   ACTUALLY SENT OVER, INCLUDING THE 0xFF SENT ALONG WITH THE LSB.
+
+2. The word_count is the number of 24-bit words sent, or the number
+   of 16-bit words divided by two.
+
+3. In C, a 16-bit word read from a file will have the bytes swapped.
+   We chose to have the C do the swapping, since the sound DSP and the
+   video DSP shouldn't have to.
+
+----------------------------------------------------------------------
+
+If the word size is 16-bits:
+
+A. Just send over the 16-bit word, wait for it to be read, and keep
+   track of the checksum:
+
+   vwrite (SOUND_DATA_WRITE, word);
+
+   vread (SOUND_STATUS, &temp1);
+   while (!(temp1 & HOST_TO_SOUND))
+ 
+   checksum += word
+
+----------------------------------------------------------------------
+
+10. Once the specified number of words has been sent, the sound DSP
+    will return the 16-bit, unsigned checksum:
+
+ wait for the checksum to show up:
+ vread (SOUND_STATUS, &temp1);
+ while (!(temp1 & SOUND_TO_HOST))
+
+ read the checksum:
+ vread (SOUND_DATA_READ, &temp2);
+ manually clear the latch:
+ vwrite (SOUND_DATA_READ, CLEAR_READ_INTERRUPT);
+
+11. Make sure the checksums match.
+
+12. Once the sound DSP has returned the checksum, it goes back to the
+idle loop and puts a 0x000A on the latch. It is now ready to receive
+either the download or run command.
+
+----------------------------------------------------------------------
+ 
+TO RUN CODE:
+
+Once ALL of the modules have been loaded, then you can run the op sys:
+
+1. read SOUND_STATUS until the SOUND_TO_HOST bit clears:
+
+   vread (SOUND_STATUS, &temp1);
+   while (!(temp1 & SOUND_TO_HOST))
+
+2. when it clears, read the data (16-bit word):
+
+   vread (SOUND_DATA_READ, &temp2);
+
+3. manually clear the bit:
+
+   vwrite (SOUND_DATA_READ, CLEAR_READ_INTERRUPT);
+
+4. make sure you got back 0x000A
+
+5. send the "run code command":
+
+   vwrite (SOUND_DATA_WRITE, 0x002A);
+
+/* A 0x002A sent to the DSP is the "run" command. This tells the monitor   */
+/* code to jump to the start of the "real" code that has been loaded.      */
+/* You must reset the sound DSP to get back into the monitor code.         */
+
+6. wait for the HOST_TO_SOUND bit to clear:
+
+   vread (SOUND_STATUS, &temp1);
+   while (!(temp1 & HOST_TO_SOUND))
+
+7. Once the bit clears, then the code should be running.
+
+
+

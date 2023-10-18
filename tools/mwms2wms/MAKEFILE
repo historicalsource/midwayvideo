@@ -1,0 +1,74 @@
+#
+# Assorted directories
+#
+INCDIR=		/video/include
+BUILDDIR=	..
+
+#
+# Include files everyone is dependant on
+#
+INCS=	$(INCDIR)/glide.h
+
+#
+# C Source Modules
+#
+CSRCS=	mwms2wms.c
+
+#
+# Object Modules
+#
+OBJS=	$(CSRCS:.c=.obj)
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/mwms2wms.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET)
+	@echo MWMS2WMS DONE
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/mwms2wms.exe:	$(OBJS)
+	@gcc -O3 -I$(INCDIR) -o $(BUILDDIR)/mwms2wms.exe $(OBJS)
+
+#
+# Rules and dependencies
+#
+%.d:	%.c
+	@echo Generating dependencies for $<
+	@gcc -M -I$(INCDIR) $< | sed 's/$*.o/&bj $@/g' > $@
+
+%.obj:	%.c
+	@echo Compiling $<
+	@gcc -c -O3 -I$(INCDIR) -o $@ $<
+
+include	$(CSRCS:.c=.d)
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning mwms2wms
+	@if EXIST mwms2wms.obj del mwms2wms.obj
+	@if EXIST mwms2wms.d del mwms2wms.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering $(BUILDDIR)\mwms2wms.exe
+	@if EXIST $(BUILDDIR)\mwms2wms.exe del $(BUILDDIR)\mwms2wms.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding $(BUILDDIR)\mwms2wms.exe
+	@$(MAKE) --no-print-directory
+
+	

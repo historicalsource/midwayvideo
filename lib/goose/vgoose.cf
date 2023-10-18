@@ -1,0 +1,24 @@
+-mhard-float
+-DINIT_DOS
+-D__DJGPP__
+-D__GOOSE__
+-DGLIDE_HARDWARE
+-DGLIDE_LIB
+-DGLIDE_USE_C_TRISETUP
+-DCVG
+-DGLIDE_HW_TRI_SETUP
+-DUSE_PACKET_FIFO
+-DGLIDE3
+-DGLIDE3_ALPHA
+-fno-builtin
+-mips4
+-fomit-frame-pointer
+-g
+-c
+-G 0
+-mcpu=r8000
+-nostdinc
+-I\video\include
+-I\video\include\glide300
+-Wall
+-Wa,mips4

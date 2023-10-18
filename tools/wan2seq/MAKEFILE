@@ -1,0 +1,78 @@
+#
+# Assorted directories
+#
+BUILDDIR=	..
+
+#
+# Include files everyone is dependant on
+#
+INCS=
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/wan2seq.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET) dummy
+
+#
+# Dummy target
+#
+dummy:
+	@echo WAN2SEQ DONE
+
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/wan2seq.exe:	lookup.h wan2seq.obj
+	@echo Linking WAN2SEQ.EXE
+	@gcc -O3 -Wall -o $@ wan2seq.obj
+	@echo WAN2SEQ.EXE built
+
+lookup.h: lookup.exe
+	lookup > lookup.h
+
+lookup.exe: lookup.c
+	gcc -Wall -o lookup.exe lookup.c
+
+test:	../wan2seq.exe foo.wan
+	wan2seq -p \video\nfl\anim\misc.wan > foo
+	grep Mean foo
+
+%.d:	%.c
+	@echo Generating Dependencies for $<
+	@gcc -M $< | sed 's/$*.o/&bj $@/g' > $@
+
+%.obj:	%.c
+	@echo Compiling $<
+	@gcc -c -Wall -O3 -o $@ $<
+
+include	wan2seq.d
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning wan2seq
+	@if EXIST wan2seq.obj del wan2seq.obj
+	@-del *.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering wan2seq
+	@if EXIST $(BUILDDIR)\wan2seq.exe del $(BUILDDIR)\wan2seq.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding wan2seq
+	@$(MAKE) --no-print-directory
+
+	

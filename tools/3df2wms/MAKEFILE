@@ -1,0 +1,73 @@
+#
+# Assorted directories
+#
+BUILDDIR=	..
+INCDIR=		/video/include
+ZINCDIR=	/video/tools/zlib
+
+#
+# Include files everyone is dependant on
+#
+INCS=	$(INCDIR)/glide/glide.h
+
+#
+# C Source Modules
+#
+CSRCS=	3df2wms.c
+
+#
+# Object Modules
+#
+OBJS=	$(CSRCS:.c=.o)
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/3df2wms.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET)
+	@echo 3DF2WMS DONE
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/3df2wms.exe:	$(OBJS)
+	@gcc -O3 -o $(BUILDDIR)/3df2wms.exe $(OBJS) /video/tools/zlib/zlib.lib
+
+#
+# Rules and dependencies
+#
+%.o:	%.c
+	@echo $< to $@ and $(basename $<).d
+	@gcc -I$(INCDIR) -I$(ZINCDIR) -MD -O3 -c -o $@ $<
+
+ifneq	($(wildcard *.d),)
+include	$(wildcard *.d)
+endif
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning 3df2wms
+	@if EXIST 3df2wms.o del 3df2wms.o
+	@if EXIST 3df2wms.d del 3df2wms.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering $(BUILDDIR)\3df2wms.exe
+	@if EXIST $(BUILDDIR)\3df2wms.exe del $(BUILDDIR)\3df2wms.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding $(BUILDDIR)\3df2wms.exe
+	@$(MAKE) --no-print-directory
+
+	

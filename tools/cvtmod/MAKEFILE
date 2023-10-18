@@ -1,0 +1,75 @@
+#
+# Assorted directories
+#
+BUILDDIR=	..
+
+#
+# C Sources Modules
+#
+CSRCS=	cvtmod.c
+
+#
+# Objet Modules
+#
+OBJS=	$(CSRCS:.c=.obj)
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/cvtmod.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET) dummy
+
+#
+# Dummy target
+#
+dummy:
+	@echo CVTMOD DONE
+
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/cvtmod.exe:	$(OBJS)
+	@echo Linking $@
+	@gcc -O3 -Wall -o $@ $(OBJS)
+	@echo $@ built
+
+%.d:	%.c
+	@echo Generating dependencies for $<
+	@gcc -M $< | sed 's/$*.o/&bj $@/g' > $@
+
+%.c:	%.l
+	@echo Generating source file
+	@flex -ocvtmod.c cvtmod.l
+
+%.obj:	%.c
+	@echo Compiling $<
+	@gcc -c -O3 -o $@ $<
+
+include	$(CSRCS:.c=.d)
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning cvtmod
+	@if EXIST cvtmod.obj del cvtmod.obj
+	@if EXIST cvtmod.c del cvtmod.c
+	@if EXIST cvtmod.d del cvtmod.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering $(BUILDDIR)\cvtmod.exe
+	@if EXIST $(BUILDDIR)\cvtmod.exe del $(BUILDDIR)\cvtmod.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@$(MAKE) --no-print-directory

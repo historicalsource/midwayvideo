@@ -1,0 +1,74 @@
+#
+# Assorted directories
+#
+INCDIR=		/video/include
+BUILDDIR=	..
+
+#
+# Include files everyone is dependant on
+#
+INCS=	$(INCDIR)/glide/glide.h
+
+#
+# C Source Modules
+#
+CSRCS=	movie.c
+
+#
+# Object Modules
+#
+OBJS=	$(CSRCS:.c=.o)
+
+#
+# What we are going to build
+#
+TARGET=	$(BUILDDIR)/movie.exe
+
+#
+# This gets built if nothing is specified on the command line
+#
+all:	$(TARGET)
+	@echo MOVIE DONE
+
+#
+# Module rules and dependencies
+#
+$(BUILDDIR)/movie.exe:	$(OBJS)
+	@gcc -O3 -I$(INCDIR) -o $(BUILDDIR)/movie.exe $(OBJS) /video/tools/putil/lib/pd.lib
+
+#
+# Rules and dependencies
+#
+%.d:	%.c
+	@echo Generating dependencies for $<
+	@gcc -M -I$(INCDIR) $< | sed 's/$*.o/&bj $@/g' > $@
+
+%.o:	%.c
+	@echo Compiling $<
+	@gcc -c -O3 -I$(INCDIR) -o $@ $<
+
+include	$(CSRCS:.c=.d)
+
+#
+# How to clean up for a complete rebuild
+#
+clean:	clobber
+	@echo Cleaning movie
+	@if EXIST movie.o del movie.o
+	@if EXIST movie.d del movie.d
+
+#
+# How to clean up for a relink only
+#
+clobber:
+	@echo Clobbering $(BUILDDIR)\movie.exe
+	@if EXIST $(BUILDDIR)\movie.exe del $(BUILDDIR)\movie.exe
+
+#
+# How to rebuild the whole works from scratch
+#
+rebuild:	clean
+	@echo Rebuilding $(BUILDDIR)\movie.exe
+	@$(MAKE) --no-print-directory
+
+	

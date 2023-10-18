@@ -1,0 +1,40 @@
+SCC = This is a Source Code Control file
+
+[b99bios.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[b99test.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[carnbios.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[carntest.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[nbabios.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[nbatest.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[nflbios.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[nfltest.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[sa1bios.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[srbios.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[srtest.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[vegabios.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA
+
+[vegatest.mak]
+SCC_Project_Name = "$/video/biosrom/bios", MFEAAAAA

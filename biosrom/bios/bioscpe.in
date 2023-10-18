@@ -1,0 +1,19 @@
+	org	$a0040000
+
+        regs    pc=start
+
+text	group
+data	group
+bss	group	bss
+ubss	group	bss,cache($20000000)
+
+	section.8 .text,text
+	section.8 .rdata,data
+	section.8 .ctors,data
+	section.8 .dtors,data
+	section.8 .data,data
+	section.8 .sdata,data
+	section.8 .sbss,bss
+	section.8 .bss,bss
+	section.8 uncached.bss,ubss
+		      
